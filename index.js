@@ -12,4 +12,6 @@ mongoose.connect(mongodbUrl, {
   .catch((error) => {
     console.log('Koneksi MongoDB gagal:', error);
   });
+
+  const app = express();
   
