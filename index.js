@@ -1,17 +1,28 @@
 const express = require('express');
 const mongoose = require('mongoose');
-require('dotenv').config()
+const loginUser = require('./routes/user-routes');
 
-mongoose.connect(mongodbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log('Terhubung ke MongoDB');
-  })
-  .catch((error) => {
-    console.log('Koneksi MongoDB gagal:', error);
-  });
+const app = express();
+const port = 3000;
 
-  const app = express();
-  
+require('dotenv').config();
+
+mongoose.connect(process.env.MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => {
+  console.log('Terhubung ke MongoDB');
+})
+.catch((error) => {
+  console.log('Koneksi MongoDB gagal:', error);
+});
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/api/users', loginUser);
+
+app.listen(port, () => {
+  console.log(`Server berjalan di port ${port}`);
+});
