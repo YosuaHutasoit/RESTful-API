@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-// Middleware untuk verifikasi token
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
   
