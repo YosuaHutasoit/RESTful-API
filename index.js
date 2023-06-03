@@ -23,6 +23,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/users', loginUser);
 
+app.get('/', (req, res) => {
+  res.send('<h1>Halo, Selamat Datang!</h1>');
+});
+
 app.listen(port, () => {
   console.log(`Server berjalan di port ${port}`);
 });
