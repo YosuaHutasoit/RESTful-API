@@ -18,23 +18,6 @@ mongoose
     console.log('Koneksi MongoDB gagal:', error);
   });
 
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
-  role: { type: String, default: 'user' }
-});
-
-const User = mongoose.model('User', userSchema);
-
-const adminSchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  password: String,
-  role: { type: String, default: 'admin' }
-});
-
-const Admin = mongoose.model('Admin', adminSchema);
 
 app.use(express.json());
 
