@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const userModel = require('./model/user')
+const adminModel = require('./model/admin')
+
 require('dotenv').config();
 
 const app = express();
@@ -42,14 +45,14 @@ app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    const existingUser = await User.findOne({ email });
+    const existingUser = await userModel.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: 'Email already registered' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new User({
+    const user = new userModel({
       name,
       email,
       password: hashedPassword,
@@ -91,7 +94,7 @@ app.post('/api/login', async (req, res) => {
 
 app.get('/api/users', verifyToken, async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await userModel.find();
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -104,7 +107,7 @@ app.post('/api/users', verifyToken, async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = new User({
+    const user = new userModel({
       name,
       email,
       password: hashedPassword,
@@ -120,7 +123,7 @@ app.post('/api/users', verifyToken, async (req, res) => {
 
 app.get('/api/admins', verifyToken, async (req, res) => {
   try {
-    const admins = await Admin.find();
+    const admins = await adminModel.find();
     res.json(admins);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -133,7 +136,7 @@ app.post('/api/admins', verifyToken, async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const admin = new Admin({
+    const admin = new adminModel({
       name,
       email,
       password: hashedPassword,
