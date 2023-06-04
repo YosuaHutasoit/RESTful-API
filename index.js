@@ -1,14 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
 
-mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose
+  .connect(process.env.MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   .then(() => {
     console.log('Terhubung ke MongoDB');
   })
@@ -25,7 +27,33 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+const adminSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  role: { type: String, default: 'admin' }
+});
+
+const Admin = mongoose.model('Admin', adminSchema);
+
 app.use(express.json());
+
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Authorization Failed' });
+  }
+
+  jwt.verify(token, process.env.TOKEN_SECRET, (error, decoded) => {
+    if (error) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    req.user = decoded;
+    next();
+  });
+};
 
 app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
@@ -54,7 +82,6 @@ app.post('/api/register', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
@@ -110,7 +137,7 @@ app.post('/api/users', verifyToken, async (req, res) => {
 
 app.get('/api/admins', verifyToken, async (req, res) => {
   try {
-    const admins = await User.find({ role: 'admin' });
+    const admins = await Admin.find();
     res.json(admins);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -123,7 +150,7 @@ app.post('/api/admins', verifyToken, async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const admin = new User({
+    const admin = new Admin({
       name,
       email,
       password: hashedPassword,
