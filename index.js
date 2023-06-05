@@ -1,16 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const userModel = require('./model/user')
 const adminModel = require('./model/admin')
+const auth = require('./token/token-verify')
 
 require('dotenv').config();
 
 const app = express();
 
-mongoose
-  .connect(process.env.MONGODB_URL, {
+mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
@@ -24,22 +23,6 @@ mongoose
 
 app.use(express.json());
 
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ message: 'Authorization Failed' });
-  }
-
-  jwt.verify(token, process.env.TOKEN_SECRET, (error, decoded) => {
-    if (error) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-    req.user = decoded;
-    next();
-  });
-};
 
 app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
@@ -92,7 +75,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-app.get('/api/users', verifyToken, async (req, res) => {
+app.get('/api/users', auth, async (req, res) => {
   try {
     const users = await userModel.find();
     res.json(users);
@@ -101,7 +84,7 @@ app.get('/api/users', verifyToken, async (req, res) => {
   }
 });
 
-app.post('/api/users', verifyToken, async (req, res) => {
+app.post('/api/users', auth, async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
@@ -121,7 +104,7 @@ app.post('/api/users', verifyToken, async (req, res) => {
   }
 });
 
-app.get('/api/admins', verifyToken, async (req, res) => {
+app.get('/api/admins', auth, async (req, res) => {
   try {
     const admins = await adminModel.find();
     res.json(admins);
@@ -130,7 +113,7 @@ app.get('/api/admins', verifyToken, async (req, res) => {
   }
 });
 
-app.post('/api/admins', verifyToken, async (req, res) => {
+app.post('/api/admins', auth, async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
