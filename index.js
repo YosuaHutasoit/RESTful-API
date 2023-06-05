@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const userRoutes = require('./routes/user-router')
+const adminRoutes = require('./routes/admin-router')
 
 require('dotenv').config();
 
@@ -18,38 +20,12 @@ mongoose.connect(process.env.MONGODB_URL, {
 
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }))
 
+// routes
+app.use('/user', userRoutes);
+app.use('/admin', adminRoutes);
 
-
-
-app.get('/api/admins', auth, async (req, res) => {
-  try {
-    const admins = await adminModel.find();
-    res.json(admins);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-app.post('/api/admins', auth, async (req, res) => {
-  const { name, email, password } = req.body;
-
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const admin = new adminModel({
-      name,
-      email,
-      password: hashedPassword,
-      role: 'admin'
-    });
-
-    const newAdmin = await admin.save();
-    res.status(201).json(newAdmin);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
 
 app.get('/', (req, res) => {
   res.send('<h1>Halo, Selamat Datang!</h1>');
