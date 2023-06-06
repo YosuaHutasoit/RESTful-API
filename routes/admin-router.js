@@ -6,7 +6,7 @@ const router = express.Router();
 const { 
   register, 
   login, 
-} = require('../controllers/User');
+} = require('../controllers/Admin');
 
 router.post('/signup', register);
 router.post('/signin', login);
