@@ -23,8 +23,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
 // routes
-app.use('/user', userRoutes);
-app.use('/admin', adminRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/admins', adminRoutes);
 
 
 app.get('/', (req, res) => {
