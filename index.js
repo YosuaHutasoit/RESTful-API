@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const connectDB = require('./config/db');
 const userRoutes = require('./routes/user-router')
 const adminRoutes = require('./routes/admin-router')
 
@@ -7,17 +7,7 @@ require('dotenv').config();
 
 const app = express();
 
-mongoose.connect(process.env.MONGODB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log('Terhubung ke MongoDB');
-  })
-  .catch((error) => {
-    console.log('Koneksi MongoDB gagal:', error);
-  });
-
+connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
