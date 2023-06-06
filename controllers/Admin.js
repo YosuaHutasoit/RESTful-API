@@ -1,4 +1,6 @@
 const adminModel = require('../model/admin');
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
  exports.register = async (req, res) => {
     const { name, email, password } = req.body;
